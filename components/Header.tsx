@@ -27,23 +27,25 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={cycleTheme}
-            aria-label="Alternar tema"
-            className="rounded-lg p-2 text-stone-500 hover:bg-[var(--surface)] hover:text-[var(--text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-          >
-            <ThemeIcon size={17} aria-hidden="true" />
-          </button>
+        <nav aria-label="Ações principais">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={cycleTheme}
+              aria-label="Alternar tema"
+              className="rounded-lg p-2 text-stone-500 hover:bg-[var(--surface)] hover:text-[var(--text)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+            >
+              <ThemeIcon size={17} aria-hidden="true" />
+            </button>
 
-          <Link
-            href="/novo"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-sm font-semibold text-black hover:bg-amber-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
-          >
-            <Plus size={15} aria-hidden="true" />
-            Adicionar
-          </Link>
-        </div>
+            <Link
+              href="/novo"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-sm font-semibold text-black hover:bg-amber-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+            >
+              <Plus size={15} aria-hidden="true" />
+              Adicionar
+            </Link>
+          </div>
+        </nav>
       </div>
     </header>
   );

@@ -31,7 +31,7 @@ export default function ViewToggle({ mode, onChange }: ViewToggleProps) {
             }`}
           >
             <Icon size={13} aria-hidden="true" />
-            <span className="hidden sm:inline">{label}</span>
+            <span className="sr-only sm:not-sr-only">{label}</span>
           </button>
         );
       })}

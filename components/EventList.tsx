@@ -34,12 +34,17 @@ function daysUntil(iso: string): number {
 interface Group { label: string; events: Event[] }
 
 function groupUpcoming(events: Event[]): Group[] {
+  const now = new Date();
+  const curYear  = now.getUTCFullYear();
+  const curMonth = now.getUTCMonth(); // 0-based
+
   const semana: Event[] = [], mes: Event[] = [], proximos: Event[] = [];
   for (const e of events) {
     if (!e.dataInicio) { proximos.push(e); continue; }
     const d = daysUntil(e.dataInicio);
+    const [y, m] = e.dataInicio.split('-').map(Number);
     if (d <= 7) semana.push(e);
-    else if (d <= 30) mes.push(e);
+    else if (y === curYear && m - 1 === curMonth) mes.push(e);
     else proximos.push(e);
   }
   const groups: Group[] = [];
@@ -94,7 +99,7 @@ export default function EventList({ events, schema }: EventListProps) {
           onClear={clearFilters}
         />
         <div className="flex items-center justify-between">
-          <p className="text-xs text-stone-600">
+          <p className="text-xs text-stone-600" aria-live="polite" aria-atomic="true">
             {filtered.length} evento{filtered.length !== 1 ? 's' : ''}
           </p>
           <ViewToggle mode={view} onChange={setView} />
@@ -136,12 +141,13 @@ export default function EventList({ events, schema }: EventListProps) {
                 onClick={() => setPastOpen((o) => !o)}
                 className="flex w-full items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-xs font-semibold uppercase tracking-widest text-stone-500 hover:text-[var(--text)] hover:border-amber-500/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                 aria-expanded={pastOpen}
+                aria-controls="past-events-list"
               >
                 <span>Passados <span className="text-stone-600 normal-case font-normal">({past.length})</span></span>
                 {pastOpen ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
               </button>
               {pastOpen && (
-                <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div id="past-events-list" className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {past.map((event) => <EventCard key={event.id} event={event} past />)}
                 </div>
               )}

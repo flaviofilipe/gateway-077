@@ -24,9 +24,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="flex min-h-full flex-col bg-[var(--bg)] antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-amber-500 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-black focus:outline-none"
+        >
+          Ir para o conteúdo principal
+        </a>
         <ThemeProvider>
           <Header />
-          <main className="flex-1">{children}</main>
+          <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
           <footer className="border-t border-[var(--border)] py-6 text-center text-xs text-stone-500 dark:text-stone-600">
             Caravana Gateway 077 — feito pela comunidade, para a comunidade
           </footer>
