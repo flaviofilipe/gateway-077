@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: var(--font-space-grotesk);
+}
+
+/* Dark-first palette — amber accent for travel/street vibe */
+:root {
+  --bg:        #fafaf9;
+  --surface:   #ffffff;
+  --border:    #e5e5e4;
+  --text:      #111110;
+  --muted:     #78716c;
+  --accent:    #d97706;
+}
+
+.dark {
+  --bg:        #0a0a09;
+  --surface:   #141413;
+  --border:    #222220;
+  --text:      #fafaf9;
+  --muted:     #78716c;
+  --accent:    #f59e0b;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
