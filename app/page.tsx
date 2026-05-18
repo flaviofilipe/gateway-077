@@ -53,10 +53,13 @@ export default async function Page({ searchParams }: PageProps) {
             <p className="text-sm text-stone-400 leading-relaxed">
               A{' '}
               <span className="font-semibold text-[var(--text)]">Caravana Gateway 077</span>{' '}
-              é uma comunidade de tecnologia nascida em{' '}
-              <span className="font-semibold text-[var(--text)]">Vitória da Conquista, Bahia</span>.
-              Este site reúne e divulga os eventos que a caravana irá acompanhar.
-              Discussões sobre viagens, organização e caronas acontecem no grupo oficial.
+              é uma comunidade de tecnologia de{' '}
+              <span className="font-semibold text-[var(--text)]">Vitória da Conquista, Bahia</span>{' '}
+              que mapeia colaborativamente os principais eventos tech do Brasil e do mundo.
+              Qualquer pessoa pode sugerir um evento — cada submissão é revisada pelo gestor da comunidade antes de ser publicada.
+            </p>
+            <p className="mt-2 text-sm text-stone-400 leading-relaxed">
+              No grupo oficial do WhatsApp divulgamos eventos e organizamos comitivas para participar juntos.
             </p>
           </div>
           <a
