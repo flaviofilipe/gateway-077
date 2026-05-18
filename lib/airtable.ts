@@ -6,8 +6,10 @@ const BASE_ID = 'appYTSd9iaa04vcec';
 const TABLE_ID = 'tbltZLRW3qBvQo3R3';
 
 function auth(): HeadersInit {
+  const token = process.env.AIRTABLE_TOKEN;
+  if (!token) throw new Error('[Airtable] AIRTABLE_TOKEN não definido. Configure em .env.local');
   return {
-    Authorization: `Bearer ${process.env.AIRTABLE_TOKEN}`,
+    Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
 }
@@ -63,18 +65,33 @@ export const fetchEvents = cache(async (): Promise<Event[]> => {
     params.set('sort[0][field]', 'data de inicio');
     params.set('sort[0][direction]', 'asc');
     if (offset) params.set('offset', offset);
-    if (moderationEnabled) params.set('filterByFormula', '{Aprovado}');
+
+    // Always show only active events — blank STATUS is treated as pendente.
+    // Optionally also require moderation approval via AIRTABLE_MODERATION env var.
+    const filters = ['{STATUS} = "ativo"'];
+    if (moderationEnabled) filters.push('{Aprovado}');
+    params.set('filterByFormula', filters.length === 1 ? filters[0] : `AND(${filters.join(', ')})`);
 
     let data: { records: AirtableRecord[]; offset?: string };
     try {
       data = await fetchPage(params);
     } catch (err) {
       const msg = (err as { airtableMessage?: string }).airtableMessage ?? '';
-      // If the Aprovado field doesn't exist yet, fall back to unfiltered and warn.
-      if (moderationEnabled && msg.includes('Aprovado')) {
-        console.warn('[Airtable] Campo "Aprovado" não encontrado — mostrando todos os eventos. Crie o campo no Airtable para ativar a moderação.');
-        params.delete('filterByFormula');
-        data = await fetchPage(params);
+
+      if (msg.includes('STATUS')) {
+        console.warn('[Airtable] Campo "STATUS" não encontrado — filtro de status desativado.');
+        const fallback = new URLSearchParams(params);
+        if (moderationEnabled) {
+          fallback.set('filterByFormula', '{Aprovado}');
+        } else {
+          fallback.delete('filterByFormula');
+        }
+        data = await fetchPage(fallback);
+      } else if (moderationEnabled && msg.includes('Aprovado')) {
+        console.warn('[Airtable] Campo "Aprovado" não encontrado — exibindo apenas eventos ativos.');
+        const fallback = new URLSearchParams(params);
+        fallback.set('filterByFormula', '{STATUS} = "ativo"');
+        data = await fetchPage(fallback);
       } else {
         throw err;
       }

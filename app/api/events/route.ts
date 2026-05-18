@@ -20,15 +20,24 @@ const MODALIDADES = ['Presencial', 'Online', 'Híbrido'] as const;
 const FAIXAS_PRECO = ['Gratuito', 'Pago', 'A confirmar'] as const;
 
 const createSchema = z.object({
-  'Nome do evento': z.string().min(1, 'Nome é obrigatório'),
-  'Descrição': z.string().min(1, 'Descrição é obrigatória'),
-  'Link do site': z.string().url('URL inválida (inclua https://)').optional(),
+  'Nome do evento': z.string().min(1, 'Nome é obrigatório').max(120, 'Máximo 120 caracteres'),
+  'Descrição':      z.string().min(1, 'Descrição é obrigatória').max(2000, 'Máximo 2000 caracteres'),
+  // Require http(s) explicitly — z.string().url() accepts javascript: and other schemes
+  'Link do site': z
+    .string()
+    .url('URL inválida (inclua https://)')
+    .refine((u) => /^https?:\/\//i.test(u), 'URL deve começar com http:// ou https://')
+    .max(500)
+    .optional(),
   'data de inicio': z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data de início inválida'),
-  'data final': z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data final inválida').optional(),
-  cidade: z.string().min(1, 'Cidade é obrigatória'),
-  UF: z.string().min(1, 'UF é obrigatória'),
-  'tags separadas por vírgola': z.array(z.string()).optional(),
-  Modalidade: z.enum(MODALIDADES).optional(),
+  'data final':     z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data final inválida').optional(),
+  cidade: z.string().min(1, 'Cidade é obrigatória').max(80, 'Máximo 80 caracteres'),
+  UF:     z.string().min(1, 'UF é obrigatória').max(10),
+  'tags separadas por vírgola': z
+    .array(z.string().max(50, 'Tag muito longa'))
+    .max(10, 'Máximo 10 tags')
+    .optional(),
+  Modalidade:      z.enum(MODALIDADES).optional(),
   'Faixa de preço': z.enum(FAIXAS_PRECO).optional(),
 });
 
@@ -36,11 +45,11 @@ export async function POST(request: NextRequest) {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '127.0.0.1';
 
-  const { allowed } = checkRateLimit(ip);
+  const { allowed, retryAfter } = checkRateLimit(ip);
   if (!allowed) {
     return Response.json(
       { error: 'Muitas requisições. Tente novamente em 10 minutos.' },
-      { status: 429 },
+      { status: 429, headers: { 'Retry-After': String(retryAfter) } },
     );
   }
 
